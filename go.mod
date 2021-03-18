@@ -4,6 +4,7 @@ go 1.15
 
 require (
 	github.com/AlecAivazis/survey/v2 v2.2.9
+	github.com/Rhymond/go-money v1.0.2
 	github.com/fatih/color v1.10.0 // indirect
 	github.com/gin-gonic/gin v1.6.3
 	github.com/google/go-cmp v0.5.5 // indirect

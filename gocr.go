@@ -12,6 +12,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/Rhymond/go-money"
 	"github.com/theckman/yacspin"
 )
 
@@ -135,15 +136,31 @@ func (c *Client) uploadFile(fileName string) (string, error) {
 		return "", err
 	}
 
+	c.spinner.Message(" Processing")
+
+	completePages := 0
+	totalPages := 0
+
 	for {
-		time.Sleep(time.Millisecond * 500)
+		time.Sleep(time.Millisecond * 300)
 		Data, err := c.getResult(pdf.ID)
 		if err != nil {
 			return "", err
 		}
 
-		if c.spinner != nil {
-			c.spinner.Message(fmt.Sprintf(" Processing %.02f%%", Data.PercentDone))
+		if c.spinner != nil && Data.NumPagesCompleted > completePages {
+			if Data.NumPages != 0 {
+
+				totalPages = Data.NumPages
+				completePages = Data.NumPagesCompleted
+
+				costPerPage := money.New(10, "USD")
+				totalCost := costPerPage.Multiply(int64(completePages)).Display()
+
+				logTmpl := " Processing %.02f%% (%d/%d pages) cost: %s"
+				logMsg := fmt.Sprintf(logTmpl, Data.PercentDone, completePages, totalPages, totalCost)
+				c.spinner.Message(logMsg)
+			}
 		}
 
 		if Data.PercentDone == 100 {
