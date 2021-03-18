@@ -9,7 +9,7 @@ import (
 	"time"
 
 	"github.com/AlecAivazis/survey/v2"
-	"github.com/montanaflynn/til/gocr"
+	"github.com/montanaflynn/gocr"
 	"github.com/theckman/yacspin"
 )
 

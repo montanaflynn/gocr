@@ -1,4 +1,4 @@
-module github.com/montanaflynn/til/gocr
+module github.com/montanaflynn/gocr
 
 go 1.15
 
