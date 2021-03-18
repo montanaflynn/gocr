@@ -4,9 +4,13 @@ Convert PDFs to Mathpix Markdown, Microsoft Word or LaTeX:
 
 ## Install
 
-```sh
-curl -sf https://gobinaries.com/montanaflynn/gocr/cmd/gocr | sh
-```
+If you have Go installed simply run: 
+
+`go get github.com/montanaflynn/gocr/cmd/gocr`
+
+Otherwise download the latest binary release for your platform at:
+
+https://github.com/montanaflynn/gocr/releases
 
 ## Usage
 
