@@ -5,3 +5,5 @@
 *.docx
 *.mmd
 bin
+dist
+cmd/api/
