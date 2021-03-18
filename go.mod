@@ -8,9 +8,10 @@ require (
 	github.com/fatih/color v1.10.0 // indirect
 	github.com/gin-gonic/gin v1.6.3
 	github.com/google/go-cmp v0.5.5 // indirect
+	github.com/jessevdk/go-flags v1.4.0
 	github.com/kr/pretty v0.1.0 // indirect
 	github.com/mattn/go-runewidth v0.0.10 // indirect
-	github.com/pkg/errors v0.9.1 // indirect
+	github.com/pdfcpu/pdfcpu v0.3.9
 	github.com/rivo/uniseg v0.2.0 // indirect
 	github.com/theckman/yacspin v0.8.0
 	golang.org/x/crypto v0.0.0-20210314154223-e6e6c4f2bb5b // indirect

@@ -9,15 +9,25 @@ import (
 	"time"
 
 	"github.com/AlecAivazis/survey/v2"
+	"github.com/Rhymond/go-money"
+	"github.com/jessevdk/go-flags"
 	"github.com/montanaflynn/gocr"
 	"github.com/theckman/yacspin"
+
+	pdfcpu "github.com/pdfcpu/pdfcpu/pkg/api"
 )
 
+var opts struct {
+	SkipAgree bool   `long:"agree" description:"Agree to pricing without confirmation."`
+	APIKey    string `long:"api-key" description:"Set Mathpix OCR API Key without question."`
+}
+
 var inputVal string
+var pageCount int
 
 func errorExit(err error) {
 	if err != nil {
-		fmt.Print(err)
+		fmt.Println(err)
 		os.Exit(1)
 	}
 }
@@ -43,15 +53,30 @@ func validateExtension(path string, validExtensions []string) error {
 }
 
 func main() {
+	args, err := flags.Parse(&opts)
+	if err != nil {
+		flagsErr, ok := err.(*flags.Error)
+		if ok {
+			if flagsErr.Type == flags.ErrHelp {
+				os.Exit(0)
+			} else {
+				os.Exit(1)
+			}
+		}
+		os.Exit(1)
+	}
 
 	apiKey := os.Getenv("MATHPIX_OCR_API_KEY")
-	args := os.Args[1:]
+	if opts.APIKey != "" {
+		apiKey = opts.APIKey
+	}
 
-	var prompt = []*survey.Question{}
+	var initialSurvey = []*survey.Question{}
 	answers := struct {
 		Key    string
 		Input  string
 		Output string
+		Agree  bool
 	}{
 		Key: apiKey,
 	}
@@ -64,7 +89,7 @@ func main() {
 	}
 
 	if answers.Key == "" {
-		prompt = append(prompt, &survey.Question{
+		initialSurvey = append(initialSurvey, &survey.Question{
 			Name: "key",
 			Prompt: &survey.Input{
 				Message: "What is your api key?",
@@ -74,7 +99,7 @@ func main() {
 	}
 
 	if answers.Input == "" {
-		prompt = append(prompt, &survey.Question{
+		initialSurvey = append(initialSurvey, &survey.Question{
 			Name: "input",
 			Prompt: &survey.Input{
 				Message: "Which file should be used as an input?",
@@ -98,8 +123,18 @@ func main() {
 		})
 	}
 
+	err = survey.Ask(initialSurvey, &answers)
+	errorExit(err)
+
+	pageCount, err := pdfcpu.PageCountFile(answers.Input)
+
+	costPerPage := money.New(10, "USD")
+	totalCost := costPerPage.Multiply(int64(pageCount)).Display()
+
+	var secondSurvey = []*survey.Question{}
+
 	if answers.Output == "" {
-		prompt = append(prompt, &survey.Question{
+		secondSurvey = append(secondSurvey, &survey.Question{
 			Name: "output",
 			Prompt: &survey.Input{
 				Message: "Where would you like to save it?",
@@ -122,7 +157,26 @@ func main() {
 		})
 	}
 
-	err := survey.Ask(prompt, &answers)
+	if !opts.SkipAgree {
+		secondSurvey = append(secondSurvey, &survey.Question{
+			Name: "agree",
+			Prompt: &survey.Confirm{
+				Message: fmt.Sprintf("Do you agree to the cost of %s for %d pages?", totalCost, pageCount),
+			},
+			Validate: func(val interface{}) error {
+				agree := val.(bool)
+				if !agree {
+					fmt.Println("You must agree to pricing to continue.")
+					os.Exit(1)
+					return errors.New("you must agree to pricing to continue")
+
+				}
+				return nil
+			},
+		})
+	}
+
+	err = survey.Ask(secondSurvey, &answers)
 	errorExit(err)
 
 	client := gocr.NewClient(answers.Key)
