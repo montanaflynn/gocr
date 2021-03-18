@@ -83,6 +83,7 @@ func main() {
 
 	if len(args) >= 1 {
 		answers.Input = args[0]
+		inputVal = answers.Input
 	}
 	if len(args) >= 2 {
 		answers.Output = args[1]
@@ -91,8 +92,8 @@ func main() {
 	if answers.Key == "" {
 		initialSurvey = append(initialSurvey, &survey.Question{
 			Name: "key",
-			Prompt: &survey.Input{
-				Message: "What is your api key?",
+			Prompt: &survey.Password{
+				Message: "What is your mathpix api key?",
 			},
 			Validate: survey.Required,
 		})
@@ -127,6 +128,9 @@ func main() {
 	errorExit(err)
 
 	pageCount, err := pdfcpu.PageCountFile(answers.Input)
+	if err != nil {
+		errorExit(fmt.Errorf("could not parse %s as a valid pdf", answers.Input))
+	}
 
 	costPerPage := money.New(10, "USD")
 	totalCost := costPerPage.Multiply(int64(pageCount)).Display()
