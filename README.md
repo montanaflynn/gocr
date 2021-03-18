@@ -5,7 +5,7 @@ Convert PDFs to Mathpix Markdown, Microsoft Word or LaTeX:
 ## Install
 
 ```sh
-curl -sf https://gobinaries.com/mathpix/gocr | sh
+curl -sf https://gobinaries.com/montanaflynn/gocr/cmd/gocr | sh
 ```
 
 ## Usage
