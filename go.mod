@@ -17,5 +17,3 @@ require (
 	golang.org/x/term v0.0.0-20210220032956-6a3ed077a48d // indirect
 	gopkg.in/check.v1 v1.0.0-20180628173108-788fd7840127 // indirect
 )
-
-replace github.com/AlecAivazis/survey/v2 => github.com/montanaflynn/survey/v2 v2.2.10-0.20210318060040-65985e31a2a9
